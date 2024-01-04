@@ -10,15 +10,18 @@
 </head>
 <body>
 <h3>Secure Video Streaming Test</h3>
+<script type="application/javascript">
+    // Range requests from the video tag do not support Bearer token
+    // (There is no option to
+</script>
 
 <video
         id="my-player"
         class="video-js"
         controls
         preload="auto"
-        width="500"
         data-setup='{}'>
-    <source src="/stream" type="video/mp4"></source>
+    <source src="/stream"  type="video/mp4" ></source>
     <p class="vjs-no-js">
         To view this video please enable JavaScript, and consider upgrading to a
         web browser that
@@ -27,7 +30,6 @@
         </a>
     </p>
 </video>
-
 <script src="https://vjs.zencdn.net/8.3.0/video.min.js"></script>
 </body>
 </html>
