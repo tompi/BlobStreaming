@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using BlobStreaming;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,8 +15,6 @@ app.UseDefaultFiles()
     .UseStaticFiles()
     .UseAuthentication()
     .UseAuthorization();
-
-
 
 app.MapGet("/test-auth", [Authorize](HttpContext httpContext) =>
 {
@@ -38,14 +37,17 @@ app.MapGet("/set-cookie", async (HttpContext httpContext) =>
     return "Cookie set!";
 });
 
+var blobClient =new BlobContainerClient(
+    "UseDevelopmentStorage=true",
+    "vidtest");
 
-app.MapGet("/stream",
-    [Authorize] [ResponseCache(NoStore = true)]
-    () =>
+app.MapGet("/stream",  [Authorize] [ResponseCache(NoStore = true)]
+    async () =>
     {
         Console.WriteLine("Stream request");
-        var video = File.OpenRead("testfilm_large.mp4");
-        return Results.Stream(video, Constants.VideoContentType, enableRangeProcessing: true);
+        var client = blobClient.GetBlobClient("testfilm_large.mp4");
+        var stream = await client.OpenReadAsync();
+        return Results.Stream(stream, Constants.VideoContentType, enableRangeProcessing: true);
     });
 
 app.Run();

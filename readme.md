@@ -21,7 +21,8 @@ Tested with 7mb file, and the browser will finish downloading the file
 before you can seek in the player...
 
 Large test film(64mb): https://filesamples.com/samples/video/mp4/sample_1280x720_surfing_with_audio.mp4
-Download this and make sure the /stream endpoint serves it (rename to testfilm_large.mp4).
+Download this and install azurite(blob storage emulator) and make a container called "vidtest".
+Put the file in the vidtest container as "testfilm_large.mp4.
 
 Posted to reddit to attempt to get some feedback:
 https://www.reddit.com/r/dotnet/comments/191gwgo/simple_alternative_to_azure_media_services/

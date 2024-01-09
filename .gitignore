@@ -18,6 +18,7 @@ Resource.designer.cs
 *.pubxml
 *.orig
 *.mp4
+__*
 
 # Build results
 [Dd]ebug/
