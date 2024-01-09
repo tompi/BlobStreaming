@@ -1,3 +1,5 @@
+namespace BlobStreaming;
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -8,23 +10,22 @@ using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BlobStreaming;
-
 /// <summary>
-/// Copied from https://stackoverflow.com/questions/69117288/sign-jwt-token-using-azure-key-vault
+/// Ideas stolen from https://stackoverflow.com/questions/69117288/sign-jwt-token-using-azure-key-vault
+/// and https://stackoverflow.com/questions/52184431/in-asp-net-core-read-jwt-token-from-cookie-instead-of-headers
 /// </summary>
 public class KeyVaultService
 {
     private readonly string _keyVaultUrl;
     private SHA256? _sha256;
     private CryptographyClient? _cryptoClient;
-    private string _publicRsaKey;
-    private RsaSecurityKey _rsaSecurityKey;
+    private RsaSecurityKey? _rsaSecurityKey;
 
     public KeyVaultService(string keyVaultUrl)
     {
         _keyVaultUrl = keyVaultUrl;
     }
+
 
     public async Task<RsaSecurityKey> GetRsaSecurityKey()
     {
@@ -33,7 +34,7 @@ public class KeyVaultService
         return _rsaSecurityKey;
     }
 
-    public async Task Sign(string userId, string jti)
+    public async Task<string> MakeJwt(string userId, string jti)
     {
         await EnsureInitialized();
 
@@ -46,11 +47,11 @@ public class KeyVaultService
 
         var header = @"{""alg"":""RS256"",""typ"":""JWT""}";
         var payload = new JwtPayload(
-            "https://liveborn.laerdal.com/",
-            "https://liveborn.laerdal.com/",
+            Constants.Issuer,
+            Constants.Audience,
             claims,
             now.AddMilliseconds(-30),
-            now.AddMinutes(120));
+            now.AddMinutes(Constants.TokenExpirationMinutes));
         var payloadJson = JsonSerializer.Serialize(payload);
         var headerAndPayload = $"{Base64UrlEncoder.Encode(header)}.{Base64UrlEncoder.Encode(payloadJson)}";
 
@@ -59,6 +60,7 @@ public class KeyVaultService
 
         var token = $"{headerAndPayload}.{Base64UrlEncoder.Encode(signature)}";
         Console.WriteLine($"JWT:\n\n{token}");
+        return token;
     }
 
     private async Task EnsureInitialized()
@@ -75,7 +77,7 @@ public class KeyVaultService
         var keyClient = new KeyClient(id.VaultUri, credential);
         KeyVaultKey key = await keyClient.GetKeyAsync(id.Name, id.Version);
 
-        using var rsaKey = key.Key.ToRSA();
+        var rsaKey = key.Key.ToRSA();
         _rsaSecurityKey = new RsaSecurityKey(rsaKey);
 
         _sha256 = SHA256.Create();

@@ -12,12 +12,25 @@ builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
         options =>
         {
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    if (context.Request.Cookies.ContainsKey(Constants.VideoCookieName))
+                    {
+                        context.Token = context.Request.Cookies[Constants.VideoCookieName];
+                    }
+                    return Task.CompletedTask;
+                }
+            };
+            var signingKey = keyVaultService.GetRsaSecurityKey().Result;
+            Console.WriteLine(signingKey.KeyId);
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = keyVaultService.GetRsaSecurityKey().Result,
-                ValidIssuer = "https://www.tcpr.link/",
-                ValidAudience = "the_world",
+                IssuerSigningKey = signingKey,
+                ValidIssuer = Constants.Issuer,
+                ValidAudience = Constants.Audience,
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateLifetime = true,

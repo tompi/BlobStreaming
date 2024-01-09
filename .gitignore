@@ -17,6 +17,7 @@ Resource.designer.cs
 *.sln.docstates
 *.pubxml
 *.orig
+*.mp4
 
 # Build results
 [Dd]ebug/

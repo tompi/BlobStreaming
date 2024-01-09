@@ -5,31 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Video Streaming Test</title>
-    <link href="https://vjs.zencdn.net/8.3.0/video-js.css" rel="stylesheet" />
     <link rel="shortcut icon" href="https://www.laerdal.com/favicon.ico" type="image/icon" />
 </head>
 <body>
 <h3>Secure Video Streaming Test</h3>
-<script type="application/javascript">
-    // Range requests from the video tag do not support Bearer token
-    // (There is no option to
-</script>
+<button onclick="setCookie()">Set cookie</button>
+<a href="video.html">Go to video</a>
 
-<video
-        id="my-player"
-        class="video-js"
-        controls
-        preload="auto"
-        data-setup='{}'>
-    <source src="/stream"  type="video/mp4" ></source>
-    <p class="vjs-no-js">
-        To view this video please enable JavaScript, and consider upgrading to a
-        web browser that
-        <a href="https://videojs.com/html5-video-support/" target="_blank">
-            supports HTML5 video
-        </a>
-    </p>
-</video>
-<script src="https://vjs.zencdn.net/8.3.0/video.min.js"></script>
+<script type="application/javascript">
+    async function setCookie() {
+        const result = await fetch('/set-cookie');
+        alert(result);
+    }
+</script>
 </body>
 </html>
