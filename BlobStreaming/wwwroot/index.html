@@ -9,14 +9,6 @@
 </head>
 <body>
 <h3>Secure Video Streaming Test</h3>
-<button onclick="setCookie()">Set cookie</button>
-<a href="video.html">Go to video</a>
-
-<script type="application/javascript">
-    async function setCookie() {
-        const result = await fetch('/set-cookie');
-        alert(result);
-    }
-</script>
+<a href="/set-cookie-and-goto-video">Set jwt token and go to video</a>
 </body>
 </html>

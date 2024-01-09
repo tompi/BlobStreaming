@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Azure.Storage.Blobs;
 using BlobStreaming;
 using Microsoft.AspNetCore.Authorization;
@@ -16,13 +18,8 @@ app.UseDefaultFiles()
     .UseAuthentication()
     .UseAuthorization();
 
-app.MapGet("/test-auth", [Authorize](HttpContext httpContext) =>
-{
-    var c = httpContext.User;
-    return "Authenticated!";
-});
 
-app.MapGet("/set-cookie", async (HttpContext httpContext) =>
+app.MapGet("/set-cookie-and-goto-video", async (HttpContext httpContext) =>
 {
     var token = await keyVaultService.MakeJwt("12345", "stream");
     var options = new CookieOptions()
@@ -34,7 +31,8 @@ app.MapGet("/set-cookie", async (HttpContext httpContext) =>
         SameSite = SameSiteMode.Strict,
     };
     httpContext.Response.Cookies.Append(Constants.VideoCookieName, token, options);
-    return "Cookie set!";
+    httpContext.Response.Redirect("/video.html");
+    return "Redirecting to video.html";
 });
 
 var blobClient =new BlobContainerClient(
@@ -49,6 +47,19 @@ app.MapGet("/stream",  [Authorize] [ResponseCache(NoStore = true)]
         var stream = await client.OpenReadAsync();
         return Results.Stream(stream, Constants.VideoContentType, enableRangeProcessing: true);
     });
+
+app.MapGet("/stream/test-auth", [Authorize](HttpContext httpContext) =>
+{
+    var userName = httpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+    return $"Authenticated as user: {userName}";
+});
+
+// This will return 401
+app.MapGet("/differenturl/test-auth", [Authorize](HttpContext httpContext) =>
+{
+    var userName = httpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+    return $"Authenticated as user: {userName}";
+});
 
 app.Run();
 
