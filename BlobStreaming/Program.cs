@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 var builder = WebApplication.CreateBuilder(args);
-var keyVaultService = new KeyVaultService("https://d-tcprlink-ne-kv-sg.vault.azure.net/keys/d-tcprlink-video-test/f6d4bded27674d3b9ad16618ed746b23");
+var keyVaultService = new KeyVaultService("https://d-tcprlink-ne-kv-sg.vault.azure.net/keys/d-tcprlink-video-test/");
 
 JwtAuthorization.SetupAuthorization(builder, keyVaultService);
 var app = builder.Build();
